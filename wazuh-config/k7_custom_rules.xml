@@ -1,0 +1,195 @@
+stom rules · XML
+Copy
+
+<!--
+  K7 AegisXDR — Custom Wazuh Detection Rules
+  ============================================
+  Rule IDs: 100200-100299 (K7 reserved range)
+
+  These rules extend Wazuh's default ruleset with:
+  1. AegisXDR scan engine integration alerts
+  2. K7 virus lab signature match events
+  3. Indian enterprise-specific threat patterns
+  4. Custom SOAR trigger rules
+
+  INSTALLATION:
+    Copy to /var/ossec/etc/rules/k7_custom_rules.xml
+    Restart Wazuh: systemctl restart wazuh-manager
+-->
+
+<group name="k7,aegis,">
+
+  <!-- ==================== AEGIS SCAN ENGINE ALERTS ==================== -->
+
+  <rule id="100200" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="source">aegis_scan_engine</field>
+    <field name="verdict">malicious</field>
+    <description>K7 Aegis Scan Engine: Malicious file detected — $(file.name) [CCA: $(confidence_score)]</description>
+    <mitre>
+      <id>T1204</id>
+      <id>T1059</id>
+    </mitre>
+    <group>malware,aegis_scan,pci_dss_5.1,pci_dss_6.2,</group>
+  </rule>
+
+  <rule id="100201" level="8">
+    <decoded_as>json</decoded_as>
+    <field name="source">aegis_scan_engine</field>
+    <field name="verdict">suspicious</field>
+    <description>K7 Aegis Scan Engine: Suspicious file detected — $(file.name) [CCA: $(confidence_score)]</description>
+    <mitre>
+      <id>T1204</id>
+    </mitre>
+    <group>malware,aegis_scan,</group>
+  </rule>
+
+  <!-- ==================== SOAR PLAYBOOK TRIGGER RULES ==================== -->
+
+  <!-- Auto-isolate: Ransomware behavior detected -->
+  <rule id="100202" level="15">
+    <if_group>malware</if_group>
+    <match>ransomware|mass_encryption|file_extension_change</match>
+    <description>CRITICAL: Ransomware behavior detected — auto-isolation triggered</description>
+    <mitre>
+      <id>T1486</id>
+    </mitre>
+    <group>ransomware,auto_response,pci_dss_11.4,</group>
+  </rule>
+
+  <!-- Auto-block: Brute force threshold exceeded -->
+  <rule id="100203" level="12">
+    <if_sid>5710,5712</if_sid>
+    <frequency>10</frequency>
+    <timeframe>120</timeframe>
+    <same_source_ip />
+    <description>K7: Brute force threshold exceeded — 10+ failures in 2 minutes from $(srcip)</description>
+    <mitre>
+      <id>T1110</id>
+      <id>T1110.001</id>
+    </mitre>
+    <group>authentication_failures,auto_response,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- ==================== K7 VIRUS LAB INTEGRATION ==================== -->
+
+  <rule id="100210" level="14">
+    <decoded_as>json</decoded_as>
+    <field name="source">k7_virus_lab</field>
+    <field name="threat_level">critical</field>
+    <description>K7 Virus Lab Alert: Critical threat signature match — $(threat.name) [Family: $(threat.family)]</description>
+    <mitre>
+      <id>T1204.002</id>
+    </mitre>
+    <group>malware,k7_viruslab,</group>
+  </rule>
+
+  <rule id="100211" level="10">
+    <decoded_as>json</decoded_as>
+    <field name="source">k7_virus_lab</field>
+    <field name="threat_level">high</field>
+    <description>K7 Virus Lab: High-severity signature match — $(threat.name)</description>
+    <group>malware,k7_viruslab,</group>
+  </rule>
+
+  <!-- ==================== INDIAN ENTERPRISE PATTERNS ==================== -->
+
+  <!-- Unusual access from outside India during non-business hours -->
+  <rule id="100220" level="10">
+    <if_sid>5716</if_sid>
+    <time>22:00-06:00</time>
+    <description>After-hours SSH access from external IP — potential unauthorized access</description>
+    <mitre>
+      <id>T1078</id>
+      <id>T1133</id>
+    </mitre>
+    <group>authentication,after_hours,</group>
+  </rule>
+
+  <!-- Multiple failed logins to critical financial systems -->
+  <rule id="100221" level="12">
+    <if_sid>5710</if_sid>
+    <frequency>5</frequency>
+    <timeframe>60</timeframe>
+    <match>erp|tally|banking|payment|sap</match>
+    <description>Multiple failed logins to financial system — PCI-DSS compliance alert</description>
+    <mitre>
+      <id>T1110</id>
+    </mitre>
+    <group>authentication_failures,financial,pci_dss_10.2.4,pci_dss_10.2.5,</group>
+  </rule>
+
+  <!-- Data exfiltration to external cloud storage -->
+  <rule id="100222" level="11">
+    <if_group>web</if_group>
+    <url>drive.google.com|dropbox.com|mega.nz|wetransfer.com|sendgb.com</url>
+    <description>Data upload to external cloud storage detected — potential data exfiltration</description>
+    <mitre>
+      <id>T1567</id>
+      <id>T1567.002</id>
+    </mitre>
+    <group>data_exfiltration,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- Suspicious PowerShell encoding (common in Indian APT campaigns) -->
+  <rule id="100223" level="12">
+    <if_sid>91818</if_sid>
+    <match>-enc|-EncodedCommand|FromBase64String|Invoke-Expression</match>
+    <description>Encoded PowerShell execution — fileless malware indicator</description>
+    <mitre>
+      <id>T1059.001</id>
+      <id>T1027</id>
+      <id>T1140</id>
+    </mitre>
+    <group>malware,fileless,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- Credential harvesting tool detected -->
+  <rule id="100224" level="13">
+    <match>mimikatz|lazagne|rubeus|secretsdump|credential_access</match>
+    <description>Credential harvesting tool detected — immediate investigation required</description>
+    <mitre>
+      <id>T1003</id>
+      <id>T1003.001</id>
+    </mitre>
+    <group>credential_theft,auto_response,pci_dss_10.2.4,</group>
+  </rule>
+
+  <!-- Lateral movement via WMI/WinRM -->
+  <rule id="100225" level="11">
+    <if_group>windows</if_group>
+    <match>wmic|winrm|Invoke-Command|Enter-PSSession</match>
+    <description>Lateral movement tool execution detected — WMI/WinRM remote execution</description>
+    <mitre>
+      <id>T1047</id>
+      <id>T1021.006</id>
+    </mitre>
+    <group>lateral_movement,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- ==================== COMPLIANCE-SPECIFIC RULES ==================== -->
+
+  <!-- PCI-DSS: Firewall configuration changed -->
+  <rule id="100230" level="8">
+    <if_group>syscheck</if_group>
+    <match>/etc/iptables|/etc/firewalld|firewall.rules</match>
+    <description>PCI-DSS 1.1.1: Firewall configuration file modified</description>
+    <group>pci_dss_1.1.1,config_change,</group>
+  </rule>
+
+  <!-- GDPR: Personal data access logged -->
+  <rule id="100231" level="6">
+    <match>personal_data|pii_access|gdpr_audit</match>
+    <description>GDPR: Personal data access event logged</description>
+    <group>gdpr_IV_30.1.g,audit,</group>
+  </rule>
+
+  <!-- RBI Cybersecurity Framework (Indian banking) -->
+  <rule id="100232" level="10">
+    <if_group>authentication_failures</if_group>
+    <match>core_banking|rtgs|neft|upi|payment_gateway</match>
+    <description>RBI Compliance: Authentication failure on banking system</description>
+    <group>rbi_cyber,banking,</group>
+  </rule>
+
+</group>

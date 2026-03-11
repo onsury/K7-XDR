@@ -1,0 +1,207 @@
+# K7 AegisXDR — Complete Production Stack
+# ==========================================
+# Wazuh XDR Engine + AegisXDR AI Layer + MongoDB
+#
+# USAGE:
+#   docker compose up -d
+#
+# COMPONENTS:
+#   wazuh-manager    — Wazuh SIEM/XDR server (port 55000 API, 1514 agent registration)
+#   wazuh-indexer    — OpenSearch indexer for Wazuh data (port 9200)
+#   wazuh-dashboard  — Wazuh native dashboard for SOC (port 5601)
+#   mongodb          — AegisXDR data store (port 27017)
+#   aegis-backend    — AegisXDR FastAPI + Wazuh bridge (port 8000)
+#   aegis-frontend   — AegisXDR React dashboard (port 3000)
+#
+# ZERO LICENSING COST. Wazuh is GPL v2 / Apache 2.0.
+# Total infra cost: ₹15,000–25,000/month on cloud VMs
+#
+# MINIMUM REQUIREMENTS:
+#   CPU: 4 cores | RAM: 8GB | Disk: 50GB SSD
+
+version: '3.8'
+
+services:
+  # ==================== WAZUH XDR ENGINE ====================
+
+  wazuh-indexer:
+    image: wazuh/wazuh-indexer:4.9.0
+    hostname: wazuh-indexer
+    restart: always
+    environment:
+      - "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g"
+      - "bootstrap.memory_lock=true"
+      - "discovery.type=single-node"
+      - "plugins.security.ssl.http.enabled=false"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - wazuh-indexer-data:/var/lib/wazuh-indexer
+    ports:
+      - "9200:9200"
+    networks:
+      - aegis-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200 | grep -q 'wazuh-indexer'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  wazuh-manager:
+    image: wazuh/wazuh-manager:4.9.0
+    hostname: wazuh-manager
+    restart: always
+    environment:
+      - INDEXER_URL=http://wazuh-indexer:9200
+      - FILEBEAT_SSL_VERIFICATION_MODE=none
+      - API_USERNAME=${WAZUH_API_USER:-wazuh-wui}
+      - API_PASSWORD=${WAZUH_API_PASSWORD:-K7AegisXDR.2025}
+    volumes:
+      - wazuh-manager-config:/var/ossec/etc
+      - wazuh-manager-api:/var/ossec/api/configuration
+      - wazuh-manager-logs:/var/ossec/logs
+      - wazuh-manager-queue:/var/ossec/queue
+      - ./wazuh-config/ossec-custom.conf:/var/ossec/etc/ossec-custom.conf:ro
+      - ./wazuh-config/k7_custom_rules.xml:/var/ossec/etc/rules/k7_custom_rules.xml:ro
+      - ./wazuh-config/k7_custom_decoders.xml:/var/ossec/etc/decoders/k7_custom_decoders.xml:ro
+    ports:
+      - "1514:1514"       # Agent registration
+      - "1515:1515"       # Agent enrollment
+      - "55000:55000"     # Wazuh API
+      - "514:514/udp"     # Syslog
+    depends_on:
+      wazuh-indexer:
+        condition: service_healthy
+    networks:
+      - aegis-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sk -u ${WAZUH_API_USER:-wazuh-wui}:${WAZUH_API_PASSWORD:-K7AegisXDR.2025} https://localhost:55000/ | grep -q 'data'"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
+  wazuh-dashboard:
+    image: wazuh/wazuh-dashboard:4.9.0
+    hostname: wazuh-dashboard
+    restart: always
+    environment:
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=SecretPassword
+      - WAZUH_API_URL=https://wazuh-manager
+      - API_USERNAME=${WAZUH_API_USER:-wazuh-wui}
+      - API_PASSWORD=${WAZUH_API_PASSWORD:-K7AegisXDR.2025}
+    ports:
+      - "5601:5601"      # SOC analyst Wazuh dashboard
+    depends_on:
+      - wazuh-indexer
+      - wazuh-manager
+    networks:
+      - aegis-net
+
+  # ==================== AEGISXDR AI LAYER ====================
+
+  mongodb:
+    image: mongo:7.0
+    hostname: aegis-mongodb
+    restart: always
+    volumes:
+      - mongodb-data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - aegis-net
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  aegis-backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    hostname: aegis-backend
+    restart: always
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017
+      - DB_NAME=aegisxdr
+      - WAZUH_API_URL=https://wazuh-manager:55000
+      - WAZUH_API_USER=${WAZUH_API_USER:-wazuh-wui}
+      - WAZUH_API_PASSWORD=${WAZUH_API_PASSWORD:-K7AegisXDR.2025}
+      - WAZUH_VERIFY_SSL=false
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - AEGIS_DEMO_MODE=${DEMO_MODE:-false}
+    ports:
+      - "8000:8000"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      wazuh-manager:
+        condition: service_healthy
+    networks:
+      - aegis-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:8000/api/ | grep -q 'AegisXDR'"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  aegis-frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    hostname: aegis-frontend
+    restart: always
+    environment:
+      - VITE_API_BASE=http://aegis-backend:8000
+    ports:
+      - "3000:80"
+    depends_on:
+      - aegis-backend
+    networks:
+      - aegis-net
+
+  # ==================== WAZUH-TO-AEGIS SYNC WORKER ====================
+  # Runs the background sync loop that pulls Wazuh data into AegisXDR
+
+  aegis-sync-worker:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    hostname: aegis-sync
+    restart: always
+    command: python -m sync_worker
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017
+      - DB_NAME=aegisxdr
+      - WAZUH_API_URL=https://wazuh-manager:55000
+      - WAZUH_API_USER=${WAZUH_API_USER:-wazuh-wui}
+      - WAZUH_API_PASSWORD=${WAZUH_API_PASSWORD:-K7AegisXDR.2025}
+      - WAZUH_VERIFY_SSL=false
+      - SYNC_AGENT_INTERVAL=300
+      - SYNC_ALERT_INTERVAL=60
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      wazuh-manager:
+        condition: service_healthy
+    networks:
+      - aegis-net
+
+volumes:
+  wazuh-indexer-data:
+  wazuh-manager-config:
+  wazuh-manager-api:
+  wazuh-manager-logs:
+  wazuh-manager-queue:
+  mongodb-data:
+
+networks:
+  aegis-net:
+    driver: bridge

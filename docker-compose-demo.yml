@@ -1,0 +1,60 @@
+# K7 AegisXDR — Demo/Pitch Mode
+# ================================
+# Runs only MongoDB + AegisXDR with demo data
+# Use this for presentations — no Wazuh server needed
+#
+# USAGE:
+#   docker compose -f docker-compose.demo.yml up -d
+#
+# Access:
+#   AegisXDR Dashboard: http://localhost:3000
+#   AegisXDR API:       http://localhost:8000/api/
+
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    restart: always
+    volumes:
+      - mongodb-demo:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - aegis-demo
+
+  aegis-backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017
+      - DB_NAME=aegisxdr_demo
+      - AEGIS_DEMO_MODE=true
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+    networks:
+      - aegis-demo
+
+  aegis-frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - aegis-backend
+    networks:
+      - aegis-demo
+
+volumes:
+  mongodb-demo:
+
+networks:
+  aegis-demo:
+    driver: bridge

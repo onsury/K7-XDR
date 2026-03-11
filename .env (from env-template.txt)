@@ -1,0 +1,13 @@
+# K7 AegisXDR — Environment Configuration
+# ==========================================
+
+# Wazuh API Credentials
+WAZUH_API_USER=wazuh-wui
+WAZUH_API_PASSWORD=K7AegisXDR.2025
+
+# Gemini API Key (for AI Reasoning Hub + Scan Engine Pass 5)
+# Get from: https://aistudio.google.com/apikey
+GEMINI_API_KEY=
+
+# Demo Mode (set to false when Wazuh server is running)
+DEMO_MODE=true

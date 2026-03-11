@@ -1,0 +1,39 @@
+<!--
+  K7 AegisXDR — Custom Wazuh Decoders
+  =====================================
+  Parses K7-specific log formats:
+  1. Aegis Scan Engine results
+  2. K7 Virus Lab threat feed
+  3. K7 endpoint agent events
+
+  INSTALLATION:
+    Copy to /var/ossec/etc/decoders/k7_custom_decoders.xml
+-->
+
+<!-- Aegis Scan Engine Results -->
+<decoder name="aegis-scan">
+  <prematch>aegis-scan:</prematch>
+</decoder>
+
+<decoder name="aegis-scan-fields">
+  <parent>aegis-scan</parent>
+  <regex>\[verdict=(\S+)\] \[confidence=(\S+)\] \[file=(\S+)\] \[sha256=(\S+)\] \[severity=(\S+)\] \[threat=(\S+)\]</regex>
+  <order>verdict,confidence_score,file.name,file.sha256,severity,threat.name</order>
+</decoder>
+
+<!-- K7 Virus Lab Threat Feed -->
+<decoder name="k7-viruslab">
+  <prematch>k7-viruslab:</prematch>
+</decoder>
+
+<decoder name="k7-viruslab-fields">
+  <parent>k7-viruslab</parent>
+  <regex>\[threat=(\S+)\] \[family=(\S+)\] \[level=(\S+)\] \[signature=(\S+)\]</regex>
+  <order>threat.name,threat.family,threat_level,signature.id</order>
+</decoder>
+
+<!-- K7 Endpoint Agent Events (JSON format) -->
+<decoder name="k7-agent-json">
+  <prematch>{"source":"k7_</prematch>
+  <plugin_decoder>JSON_Decoder</plugin_decoder>
+</decoder>
