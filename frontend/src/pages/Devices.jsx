@@ -121,7 +121,7 @@ export default function Devices() {
                 </td>
                 <td className="px-4 py-3"><span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">{dev.type || dev.deviceType}</span></td>
                 <td className="px-4 py-3 text-xs font-mono text-gray-600">{dev.ip || dev.ipAddress}</td>
-                <td className="px-4 py-3 text-xs text-gray-500">{dev.os}</td>
+                <td className="px-4 py-3 text-xs text-gray-500">{dev.os?.name} {dev.os?.version}</td>
                 <td className="px-4 py-3"><StatusDot status={dev.agentStatus} /></td>
                 <td className="px-4 py-3"><RiskBar score={dev.riskScore || 0} /></td>
               </tr>
