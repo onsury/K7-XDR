@@ -99,7 +99,7 @@ export default function ComplianceTimers() {
             {certInTimers.slice(0, 9).map(t => (
               <div key={t.incidentId + t.type} className="border border-gray-200 rounded-lg p-3">
                 <div className="flex items-center justify-between mb-2">
-                  <button onClick={() => navigate(`/incidents/${t.incidentId}`)} className="text-sm font-medium text-k7-500 hover:underline">{t.incidentId}</button>
+                  <button onClick={() => navigate(`/app/incidents/${t.incidentId}`)} className="text-sm font-medium text-k7-500 hover:underline">{t.incidentId}</button>
                   <span className={`text-xs px-2 py-0.5 rounded-full ${
                     t.severity === 'critical' ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'
                   }`}>{t.severity}</span>

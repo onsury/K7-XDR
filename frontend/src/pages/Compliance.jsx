@@ -40,7 +40,7 @@ export default function Compliance() {
           <h1 className="text-2xl font-bold text-gray-900">Compliance</h1>
           <p className="text-sm text-gray-400">{frameworks.length} regulatory frameworks tracked</p>
         </div>
-        <button onClick={() => navigate('/certin-dpdpa')} className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors">
+        <button onClick={() => navigate('/app/certin-dpdpa')} className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors">
           🇮🇳 CERT-In / DPDPA Timers →
         </button>
       </div>

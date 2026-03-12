@@ -3,19 +3,19 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../App'
 
 const NAV = [
-  { path: '/', label: 'Dashboard', icon: '📊' },
-  { path: '/incidents', label: 'Incidents', icon: '🚨' },
-  { path: '/devices', label: 'Devices', icon: '💻' },
-  { path: '/alerts', label: 'Alerts', icon: '🔔' },
-  { path: '/compliance', label: 'Compliance', icon: '📋' },
-  { path: '/threat-hunt', label: 'Threat Hunt', icon: '🔍' },
-  { path: '/attack-coverage', label: 'ATT&CK Coverage', icon: '🗺' },
-  { path: '/rules', label: 'Rules', icon: '⚙' },
-  { path: '/playbooks', label: 'Playbooks', icon: '📖' },
-  { path: '/reports', label: 'Reports', icon: '📄' },
-  { path: '/integrations', label: 'Integrations', icon: '🔗' },
+  { path: '/app', label: 'Dashboard', icon: '📊' },
+  { path: '/app/incidents', label: 'Incidents', icon: '🚨' },
+  { path: '/app/devices', label: 'Devices', icon: '💻' },
+  { path: '/app/alerts', label: 'Alerts', icon: '🔔' },
+  { path: '/app/compliance', label: 'Compliance', icon: '📋' },
+  { path: '/app/threat-hunt', label: 'Threat Hunt', icon: '🔍' },
+  { path: '/app/attack-coverage', label: 'ATT&CK Coverage', icon: '🗺' },
+  { path: '/app/rules', label: 'Rules', icon: '⚙' },
+  { path: '/app/playbooks', label: 'Playbooks', icon: '📖' },
+  { path: '/app/reports', label: 'Reports', icon: '📄' },
+  { path: '/app/integrations', label: 'Integrations', icon: '🔗' },
   { path : '/compliance-timers', label: 'CERT-In/DPDPA', icon: '⏱'},
-  { path: '/settings', label: 'Settings', icon: '⚡' },
+  { path: '/app/settings', label: 'Settings', icon: '⚡' },
 ]
 
 export default function Layout() {

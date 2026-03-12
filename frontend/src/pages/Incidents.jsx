@@ -49,7 +49,7 @@ export default function Incidents() {
             {loading ? (
               <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">Loading...</td></tr>
             ) : filtered.map((inc, i) => (
-              <tr key={i} className="hover:bg-gray-50 cursor-pointer" onClick={() => navigate('/incidents/' + (inc.id || inc.incident_id))}>
+              <tr key={i} className="hover:bg-gray-50 cursor-pointer" onClick={() => navigate('/app/incidents' + (inc.id || inc.incident_id))}>
                 <td className="px-4 py-3 text-gray-500 font-mono text-xs">{inc.id || inc.incident_id}</td>
                 <td className="px-4 py-3 font-medium text-gray-900">{inc.title}</td>
                 <td className="px-4 py-3"><span className={`px-2 py-1 rounded text-xs font-medium ${severityColor(inc.severity)}`}>{inc.severity}</span></td>

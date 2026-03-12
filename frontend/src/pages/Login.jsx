@@ -26,7 +26,7 @@ export default function Login() {
       })
       if (res.success) {
         setUser(res.user)
-        navigate('/')
+        navigate('/app')
       } else {
         setError(res.error || 'Login failed')
       }

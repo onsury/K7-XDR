@@ -153,12 +153,12 @@ export default function Dashboard() {
 
       {/* Stat Cards Row */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-        <StatCard label="Incidents" value={s.totalIncidents} sub={`${sev.critical} critical`} icon="🚨" accent="text-red-600" onClick={() => navigate('/incidents')} />
-        <StatCard label="Devices" value={s.totalDevices} sub={`${s.activeAgents} active agents`} icon="💻" accent="text-blue-600" onClick={() => navigate('/devices')} />
-        <StatCard label="Alerts" value={s.totalAlerts} sub="Last 7 days" icon="🔔" accent="text-orange-600" onClick={() => navigate('/alerts')} />
-        <StatCard label="High Risk" value={s.highRiskDevices} sub="Risk ≥ 70" icon="⚠️" accent="text-red-500" onClick={() => navigate('/devices')} />
-        <StatCard label="CERT-In" value={`${certinExpired} overdue`} sub="6-hour deadline" icon="🇮🇳" accent={certinExpired > 0 ? 'text-red-600' : 'text-green-600'} onClick={() => navigate('/certin-dpdpa')} />
-        <StatCard label="DPDPA" value={`${dpdpaActive} active`} sub="72-hour window" icon="🛡️" accent="text-orange-500" onClick={() => navigate('/certin-dpdpa')} />
+        <StatCard label="Incidents" value={s.totalIncidents} sub={`${sev.critical} critical`} icon="🚨" accent="text-red-600" onClick={() => navigate('/app/incidents')} />
+        <StatCard label="Devices" value={s.totalDevices} sub={`${s.activeAgents} active agents`} icon="💻" accent="text-blue-600" onClick={() => navigate('/app/devices')} />
+        <StatCard label="Alerts" value={s.totalAlerts} sub="Last 7 days" icon="🔔" accent="text-orange-600" onClick={() => navigate('/app/alerts')} />
+        <StatCard label="High Risk" value={s.highRiskDevices} sub="Risk ≥ 70" icon="⚠️" accent="text-red-500" onClick={() => navigate('/app/devices')} />
+        <StatCard label="CERT-In" value={`${certinExpired} overdue`} sub="6-hour deadline" icon="🇮🇳" accent={certinExpired > 0 ? 'text-red-600' : 'text-green-600'} onClick={() => navigate('/app/certin-dpdpa')} />
+        <StatCard label="DPDPA" value={`${dpdpaActive} active`} sub="72-hour window" icon="🛡️" accent="text-orange-500" onClick={() => navigate('/app/certin-dpdpa')} />
       </div>
 
       {/* Charts Row */}
@@ -225,13 +225,13 @@ export default function Dashboard() {
         <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200">
           <div className="p-4 border-b border-gray-100 flex items-center justify-between">
             <h2 className="font-semibold text-gray-900">Recent Incidents</h2>
-            <button onClick={() => navigate('/incidents')} className="text-xs text-k7-600 hover:underline">View all →</button>
+            <button onClick={() => navigate('/app/incidents')} className="text-xs text-k7-600 hover:underline">View all →</button>
           </div>
           <div className="divide-y divide-gray-50">
             {data.recentIncidents.slice(0, 8).map(inc => (
               <button
                 key={inc.id}
-                onClick={() => navigate(`/incidents/${inc.id}`)}
+                onClick={() => navigate(`/app/incidents/${inc.id}`)}
                 className="w-full text-left px-4 py-2.5 hover:bg-gray-50 flex items-center justify-between transition-colors"
               >
                 <div className="flex-1 min-w-0">
@@ -305,7 +305,7 @@ export default function Dashboard() {
                   <span className="text-sm font-bold text-green-300">{timers.timers.filter(t => t.reported).length}</span>
                 </div>
               </div>
-              <button onClick={() => navigate('/certin-dpdpa')} className="mt-3 w-full text-center text-xs bg-white/10 hover:bg-white/20 rounded py-1.5 transition-colors">
+              <button onClick={() => navigate('/app/certin-dpdpa')} className="mt-3 w-full text-center text-xs bg-white/10 hover:bg-white/20 rounded py-1.5 transition-colors">
                 View Timers →
               </button>
             </div>

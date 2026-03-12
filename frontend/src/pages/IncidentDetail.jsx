@@ -69,7 +69,7 @@ export default function IncidentDetail() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <button onClick={() => navigate('/incidents')} className="text-sm text-k7-600 hover:underline mb-2 block">← Back to Incidents</button>
+          <button onClick={() => navigate('/app/incidents')} className="text-sm text-k7-600 hover:underline mb-2 block">← Back to Incidents</button>
           <h1 className="text-xl font-bold text-gray-900">{inc.title}</h1>
           <div className="flex items-center gap-2 mt-2">
             <Badge text={inc.severity} color={sevColor(inc.severity)} />

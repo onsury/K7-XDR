@@ -45,9 +45,9 @@ export default function App() {
     <AuthContext.Provider value={{ user, setUser: login, logout }}>
       <BrowserRouter>
         <Routes>
-          <Route path="/home" element={<HomePage />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+          <Route path="/app" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route index element={<Dashboard />} />
             <Route path="incidents" element={<Incidents />} />
             <Route path="incidents/:id" element={<IncidentDetail />} />
