@@ -52,7 +52,7 @@ app.include_router(compliance.router, prefix="/api/compliance", tags=["Complianc
 app.include_router(compliance_workflow.router, prefix="/api/certin-dpdpa", tags=["Compliance Workflow"])
 app.include_router(threat_hunt.router, prefix="/api/threat-hunt", tags=["Threat Hunt"])
 app.include_router(attack_coverage.router, prefix="/api/attack-coverage", tags=["ATT&CK Coverage"])
-app.include_router(rules.router, prefix="/api/rules                                                                                                                                                                                                                                                                    les", tags=["Detection Rules"])
+app.include_router(rules.router, prefix="/api/rules", tags=["Detection Rules"])
 app.include_router(playbooks.router, prefix="/api/playbooks", tags=["Playbooks"])
 app.include_router(reports.router, prefix="/api/reports", tags=["Reports"])
 app.include_router(integrations.router, prefix="/api/integrations", tags=["Integrations"])
