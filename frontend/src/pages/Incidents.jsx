@@ -9,7 +9,7 @@ export default function Incidents() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    api('/api/incidents/')
+    api('/api/incidents')
       .then(d => setIncidents(d.incidents || d || []))
       .catch(() => setIncidents([]))
       .finally(() => setLoading(false))
