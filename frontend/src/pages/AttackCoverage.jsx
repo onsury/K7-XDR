@@ -6,7 +6,7 @@ export default function AttackCoverage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    api('/api/attack-coverage/')
+    api('/api/attack-coverage')
       .then(d => setData(d))
       .catch(() => setData(null))
       .finally(() => setLoading(false))

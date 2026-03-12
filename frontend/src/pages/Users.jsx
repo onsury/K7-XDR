@@ -6,7 +6,7 @@ export default function Users() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    api('/api/users/')
+    api('/api/users')
       .then(d => setUsers(d.users || d || []))
       .catch(() => setUsers([]))
       .finally(() => setLoading(false))

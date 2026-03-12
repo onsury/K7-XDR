@@ -6,7 +6,7 @@ export default function ActionsLog() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    api('/api/actions-log/')
+    api('/api/actions-log')
       .then(d => setLogs(d.logs || d || []))
       .catch(() => setLogs([]))
       .finally(() => setLoading(false))
