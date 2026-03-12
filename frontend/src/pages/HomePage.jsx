@@ -159,9 +159,41 @@ export default function HomePage() {
         </button>
       </section>
 
-      <footer className="px-8 py-6 border-t border-white/10 text-center">
-        <div className="text-blue-300 text-sm">K7 Computing Private Limited - Chennai, India</div>
-        <div className="text-blue-400 text-xs mt-1">Enterprise Extended Detection & Response Platform v1.0.0-mvp</div>
+      <footer className="px-8 py-10 border-t border-white/10">
+        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+          <div>
+            <div className="text-white font-semibold mb-3">Platform</div>
+            <div className="space-y-2">
+              <div className="text-blue-300 text-sm cursor-pointer hover:text-white" onClick={() => navigate('/enterprise')}>Enterprise Portfolio</div>
+              <div className="text-blue-300 text-sm cursor-pointer hover:text-white" onClick={() => navigate('/consumer')}>Consumer Portfolio</div>
+              <div className="text-blue-300 text-sm cursor-pointer hover:text-white" onClick={() => navigate('/login')}>Sign In to XDR</div>
+            </div>
+          </div>
+          <div>
+            <div className="text-white font-semibold mb-3">Resources</div>
+            <div className="space-y-2">
+              <div className="text-blue-300 text-sm cursor-pointer hover:text-white" onClick={() => navigate('/whitepapers')}>Whitepapers</div>
+              <div className="text-blue-300 text-sm cursor-pointer hover:text-white" onClick={() => navigate('/case-studies')}>Case Studies</div>
+            </div>
+          </div>
+          <div>
+            <div className="text-white font-semibold mb-3">Company</div>
+            <div className="space-y-2">
+              <div className="text-blue-300 text-sm cursor-pointer hover:text-white" onClick={() => navigate('/about')}>About K7 Computing</div>
+              <div className="text-blue-300 text-sm cursor-pointer hover:text-white" onClick={() => navigate('/privacy')}>Privacy Policy</div>
+              <div className="text-blue-300 text-sm cursor-pointer hover:text-white" onClick={() => navigate('/terms')}>Terms of Use</div>
+            </div>
+          </div>
+          <div>
+            <div className="text-white font-semibold mb-3">Support</div>
+            <div className="text-blue-300 text-sm">enterprise@k7computing.com</div>
+            <div className="text-blue-300 text-sm">1800 419 0077</div>
+            <div className="text-blue-300 text-sm mt-2">Chennai, Tamil Nadu, India</div>
+          </div>
+        </div>
+        <div className="border-t border-white/10 pt-6 text-center">
+          <div className="text-blue-300 text-sm">© 2026 K7 Computing Private Limited. All rights reserved.</div>
+        </div>
       </footer>
     </div>
   )
