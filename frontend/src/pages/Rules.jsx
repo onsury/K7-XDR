@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { api } from '../lib/api'
 
 export default function Rules() {
-  const [data, setData] = useState(null)
+  const [data, setData] = useState({rules: []})
 
   useEffect(() => {
     api('/api/rules').then(setData)
